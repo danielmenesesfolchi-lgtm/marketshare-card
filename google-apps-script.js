@@ -1,44 +1,26 @@
 /**
  * Google Apps Script — Receptor de formulario de contacto
  * =========================================================
- * INSTRUCCIONES DE INSTALACIÓN:
+ * SHEET: https://docs.google.com/spreadsheets/d/1pYY8ZfyPmi-h4ELNx_lb_NZzaniy8NwhoOAqZVaxDO8/edit
  *
- * 1. Ve a https://sheets.google.com y crea una nueva hoja de cálculo.
- *    Nómbrala "Contactos Market Share".
- *
- * 2. En la primera fila escribe los encabezados:
- *    A1: Fecha | B1: Nombre | C1: Email | D1: Teléfono | E1: Empresa
- *
- * 3. En el menú: Extensiones → Apps Script
- *
- * 4. Borra el código que aparece y pega TODO este archivo.
- *
- * 5. Guarda el proyecto (Ctrl+S). Ponle un nombre, ej. "Contactos API".
- *
- * 6. Click en "Implementar" → "Nueva implementación"
+ * INSTRUCCIONES:
+ * 1. Abre el Sheet de arriba → Extensiones → Apps Script
+ * 2. Borra el código existente y pega este archivo completo
+ * 3. Guarda (Ctrl+S) con nombre "API Contactos"
+ * 4. Implementar → Nueva implementación
  *    - Tipo: Aplicación web
- *    - Ejecutar como: Yo (tu cuenta)
- *    - Quién tiene acceso: Cualquier usuario
- *    → Click en "Implementar"
- *    → Autoriza los permisos cuando te lo pida.
- *
- * 7. Copia la URL que aparece (termina en /exec).
- *
- * 8. En index.html, reemplaza 'TU_GOOGLE_APPS_SCRIPT_URL_AQUI'
- *    por esa URL.
- *
- * ¡Listo! Cada vez que alguien envíe el formulario,
- * aparecerá una nueva fila en tu Google Sheet.
+ *    - Ejecutar como: Yo
+ *    - Acceso: Cualquier usuario
+ * 5. Copia la URL /exec y pégala en index.html → SHEET_URL
  */
 
-const SHEET_NAME = ''; // Déjalo vacío para usar la primera hoja
+const SHEET_ID   = '1pYY8ZfyPmi-h4ELNx_lb_NZzaniy8NwhoOAqZVaxDO8';
+const SHEET_NAME = 'Hoja 1'; // Cambia si tu hoja tiene otro nombre
 
 function doPost(e) {
   try {
-    var ss    = SpreadsheetApp.getActiveSpreadsheet();
-    var sheet = SHEET_NAME
-                  ? ss.getSheetByName(SHEET_NAME)
-                  : ss.getSheets()[0];
+    var ss    = SpreadsheetApp.openById(SHEET_ID);
+    var sheet = ss.getSheetByName(SHEET_NAME) || ss.getSheets()[0];
 
     var data  = JSON.parse(e.postData.contents);
 
@@ -63,8 +45,8 @@ function doPost(e) {
 
 // Test manual: ejecuta esta función desde el editor para verificar
 function testInsert() {
-  var ss    = SpreadsheetApp.getActiveSpreadsheet();
-  var sheet = ss.getSheets()[0];
+  var ss    = SpreadsheetApp.openById(SHEET_ID);
+  var sheet = ss.getSheetByName(SHEET_NAME) || ss.getSheets()[0];
   sheet.appendRow([
     new Date().toLocaleString('es-CL'),
     'Test Usuario',
