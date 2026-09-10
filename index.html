@@ -1,0 +1,549 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Mauricio Meneses · Market Share</title>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --green:       #2A5C2A;
+      --green-light: #3a7c3a;
+      --green-bg:    #f0f5f0;
+      --orange:      #F47820;
+      --orange-dark: #d96510;
+      --white:       #ffffff;
+      --gray:        #f4f4f4;
+      --text:        #1c1c1c;
+      --muted:       #6b6b6b;
+      --border:      #e2e2e2;
+      --radius:      20px;
+      --shadow:      0 4px 24px rgba(0,0,0,.10), 0 1px 4px rgba(0,0,0,.06);
+    }
+
+    body {
+      font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+      background: linear-gradient(160deg, #e8f0e8 0%, #f4f4f4 60%);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 28px 16px 56px;
+      color: var(--text);
+    }
+
+    /* ─── TARJETA ──────────────────────────────────── */
+    .card {
+      width: 100%;
+      max-width: 440px;
+      background: var(--white);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      overflow: hidden;
+    }
+
+    /* franja superior verde */
+    .card-stripe {
+      background: var(--green);
+      height: 8px;
+    }
+
+    /* logo de la empresa */
+    .card-logo {
+      background: var(--green);
+      padding: 24px 28px 20px;
+      display: flex;
+      justify-content: center;
+    }
+
+    .card-logo img {
+      width: 100%;
+      max-width: 320px;
+      height: auto;
+      display: block;
+      /* recortamos el padding transparente que trae la imagen */
+      object-fit: contain;
+    }
+
+    /* nombre y cargo */
+    .card-identity {
+      padding: 22px 28px 0;
+      border-top: 4px solid var(--orange);
+    }
+
+    .person-name {
+      font-size: 1.6rem;
+      font-weight: 800;
+      color: var(--green);
+      letter-spacing: -.3px;
+      line-height: 1.1;
+    }
+
+    .person-role {
+      display: inline-block;
+      margin-top: 6px;
+      font-size: .85rem;
+      font-weight: 700;
+      color: var(--orange);
+      text-transform: uppercase;
+      letter-spacing: 1px;
+    }
+
+    /* botones de acción rápida */
+    .action-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+      padding: 18px 28px;
+    }
+
+    .action-btn {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 11px 14px;
+      border-radius: 12px;
+      border: 1.5px solid var(--border);
+      background: var(--gray);
+      text-decoration: none;
+      color: var(--text);
+      font-size: .88rem;
+      font-weight: 600;
+      transition: border-color .18s, background .18s, transform .12s;
+      cursor: pointer;
+    }
+
+    .action-btn:hover {
+      border-color: var(--green);
+      background: var(--green-bg);
+      transform: translateY(-1px);
+    }
+
+    .action-btn .ab-icon {
+      flex-shrink: 0;
+      width: 34px;
+      height: 34px;
+      border-radius: 9px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .action-btn .ab-icon svg { width: 18px; height: 18px; }
+
+    .ab-icon.call   { background: #e6f4ea; } .ab-icon.call   svg { fill: var(--green); }
+    .ab-icon.mail   { background: #e8f0fe; } .ab-icon.mail   svg { fill: #1a73e8; }
+    .ab-icon.web    { background: #fef3e2; } .ab-icon.web    svg { fill: var(--orange); }
+    .ab-icon.maps   { background: #fce8e6; } .ab-icon.maps   svg { fill: #d93025; }
+
+    .action-btn .ab-label {
+      display: flex;
+      flex-direction: column;
+      line-height: 1.2;
+    }
+
+    .action-btn .ab-label small {
+      font-size: .72rem;
+      color: var(--muted);
+      font-weight: 500;
+    }
+
+    /* ─── SECCIÓN QR ───────────────────────────────── */
+    .qr-card {
+      width: 100%;
+      max-width: 440px;
+      margin-top: 14px;
+      background: var(--white);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      padding: 24px 28px;
+      display: flex;
+      align-items: center;
+      gap: 22px;
+    }
+
+    .qr-box { flex-shrink: 0; }
+
+    #qr-code canvas,
+    #qr-code img {
+      display: block;
+      border-radius: 10px;
+      border: 3px solid var(--green);
+    }
+
+    .btn-vcf {
+      margin-top: 10px;
+      width: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      background: var(--green);
+      color: white;
+      border: none;
+      border-radius: 9px;
+      padding: 8px 10px;
+      font-size: .8rem;
+      font-weight: 700;
+      cursor: pointer;
+      transition: background .18s;
+      font-family: inherit;
+    }
+    .btn-vcf:hover { background: var(--green-light); }
+    .btn-vcf svg   { width: 14px; height: 14px; fill: white; flex-shrink: 0; }
+
+    .qr-info h3 {
+      font-size: 1rem;
+      font-weight: 800;
+      color: var(--green);
+      line-height: 1.2;
+    }
+
+    .qr-info p {
+      margin-top: 6px;
+      font-size: .82rem;
+      color: var(--muted);
+      line-height: 1.5;
+    }
+
+    /* ─── FORMULARIO ───────────────────────────────── */
+    .form-card {
+      width: 100%;
+      max-width: 440px;
+      margin-top: 14px;
+      background: var(--white);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      overflow: hidden;
+    }
+
+    .form-header {
+      background: var(--green);
+      padding: 18px 28px;
+    }
+
+    .form-header h2 {
+      font-size: 1.1rem;
+      font-weight: 800;
+      color: white;
+    }
+
+    .form-header p {
+      font-size: .82rem;
+      color: rgba(255,255,255,.72);
+      margin-top: 2px;
+    }
+
+    .form-body { padding: 22px 28px 28px; }
+
+    .field { margin-bottom: 13px; }
+
+    label {
+      display: block;
+      font-size: .75rem;
+      font-weight: 700;
+      color: var(--muted);
+      text-transform: uppercase;
+      letter-spacing: .6px;
+      margin-bottom: 5px;
+    }
+
+    .input-wrap {
+      position: relative;
+      display: flex;
+      align-items: center;
+    }
+
+    .input-wrap .fi {
+      position: absolute;
+      left: 12px;
+      width: 16px;
+      height: 16px;
+      fill: var(--muted);
+      pointer-events: none;
+      flex-shrink: 0;
+    }
+
+    input {
+      width: 100%;
+      padding: 11px 14px 11px 38px;
+      border: 1.5px solid var(--border);
+      border-radius: 11px;
+      font-size: .95rem;
+      font-family: inherit;
+      background: var(--gray);
+      outline: none;
+      transition: border-color .18s, box-shadow .18s, background .18s;
+      color: var(--text);
+    }
+
+    input::placeholder { color: #bbb; }
+
+    input:focus {
+      border-color: var(--green);
+      background: white;
+      box-shadow: 0 0 0 3px rgba(42,92,42,.10);
+    }
+
+    .btn-submit {
+      margin-top: 6px;
+      width: 100%;
+      padding: 14px;
+      background: var(--orange);
+      color: white;
+      border: none;
+      border-radius: 12px;
+      font-size: 1rem;
+      font-weight: 800;
+      font-family: inherit;
+      cursor: pointer;
+      letter-spacing: .2px;
+      transition: background .18s, transform .1s;
+    }
+
+    .btn-submit:hover   { background: var(--orange-dark); }
+    .btn-submit:active  { transform: scale(.98); }
+    .btn-submit:disabled { opacity: .55; cursor: not-allowed; transform: none; }
+
+    .feedback {
+      display: none;
+      margin-top: 12px;
+      padding: 12px 16px;
+      border-radius: 11px;
+      font-size: .88rem;
+      font-weight: 600;
+      line-height: 1.4;
+    }
+    .feedback.ok  { display: block; background: #e6f4ea; color: #1e6e30; }
+    .feedback.err { display: block; background: #fce8e6; color: #b52b20; }
+
+    /* ─── FOOTER ───────────────────────────────────── */
+    footer {
+      margin-top: 32px;
+      font-size: .73rem;
+      color: #aaa;
+      text-align: center;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- ══ TARJETA DE PRESENTACIÓN ══════════════════════ -->
+  <div class="card">
+    <div class="card-stripe"></div>
+
+    <div class="card-logo">
+      <img src="mauriciomeneses65.png" alt="Market Share" />
+    </div>
+
+    <div class="card-identity">
+      <div class="person-name">Mauricio Meneses</div>
+      <div class="person-role">Jefe de Operaciones</div>
+    </div>
+
+    <div class="action-row">
+      <a class="action-btn" href="tel:+56926364872">
+        <div class="ab-icon call">
+          <svg viewBox="0 0 24 24"><path d="M6.6 10.8c1.4 2.8 3.8 5.1 6.6 6.6l2.2-2.2c.27-.27.67-.36 1.02-.24 1.12.37 2.32.57 3.58.57.55 0 1 .45 1 1V20c0 .55-.45 1-1 1C10.29 21 3 13.71 3 5c0-.55.45-1 1-1h3.5c.55 0 1 .45 1 1 0 1.25.2 2.45.57 3.57.11.35.03.74-.24 1.01L6.6 10.8z"/></svg>
+        </div>
+        <div class="ab-label">
+          <small>Llamar</small>
+          +56 9 2636 4872
+        </div>
+      </a>
+
+      <a class="action-btn" href="mailto:mauricio.meneses@marketshare.cl">
+        <div class="ab-icon mail">
+          <svg viewBox="0 0 24 24"><path d="M20 4H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 4l-8 5-8-5V6l8 5 8-5v2z"/></svg>
+        </div>
+        <div class="ab-label">
+          <small>Correo</small>
+          Enviar email
+        </div>
+      </a>
+
+      <a class="action-btn" href="https://www.marketshare.cl" target="_blank" rel="noopener">
+        <div class="ab-icon web">
+          <svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 17.93c-3.95-.49-7-3.85-7-7.93 0-.62.08-1.21.21-1.79L9 15v1c0 1.1.9 2 2 2v1.93zm6.9-2.54c-.26-.81-1-1.39-1.9-1.39h-1v-3c0-.55-.45-1-1-1H8v-2h2c.55 0 1-.45 1-1V7h2c1.1 0 2-.9 2-2v-.41c2.93 1.19 5 4.06 5 7.41 0 2.08-.8 3.97-2.1 5.39z"/></svg>
+        </div>
+        <div class="ab-label">
+          <small>Sitio web</small>
+          marketshare.cl
+        </div>
+      </a>
+
+      <a class="action-btn" href="https://maps.google.com/?q=Av.+Del+Parque+5339,+Huechuraba" target="_blank" rel="noopener">
+        <div class="ab-icon maps">
+          <svg viewBox="0 0 24 24"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/></svg>
+        </div>
+        <div class="ab-label">
+          <small>Ubicación</small>
+          Ver en mapa
+        </div>
+      </a>
+    </div>
+  </div>
+
+  <!-- ══ QR VCARD ══════════════════════════════════════ -->
+  <div class="qr-card">
+    <div class="qr-box">
+      <div id="qr-code"></div>
+      <button class="btn-vcf" onclick="downloadVCard()">
+        <svg viewBox="0 0 24 24"><path d="M19 9h-4V3H9v6H5l7 7 7-7zM5 18v2h14v-2H5z"/></svg>
+        Guardar contacto
+      </button>
+    </div>
+    <div class="qr-info">
+      <h3>Escanea para guardar mi contacto</h3>
+      <p>Apunta la cámara de tu celular al código QR para agregar automáticamente mis datos al teléfono.</p>
+    </div>
+  </div>
+
+  <!-- ══ FORMULARIO ════════════════════════════════════ -->
+  <div class="form-card">
+    <div class="form-header">
+      <h2>Déjame tus datos</h2>
+      <p>Te contactaré a la brevedad.</p>
+    </div>
+
+    <div class="form-body">
+      <form id="contactForm" novalidate>
+
+        <div class="field">
+          <label for="nombre">Nombre completo *</label>
+          <div class="input-wrap">
+            <svg class="fi" viewBox="0 0 24 24"><path d="M12 12c2.7 0 4.8-2.1 4.8-4.8S14.7 2.4 12 2.4 7.2 4.5 7.2 7.2 9.3 12 12 12zm0 2.4c-3.2 0-9.6 1.6-9.6 4.8v2.4h19.2v-2.4c0-3.2-6.4-4.8-9.6-4.8z"/></svg>
+            <input type="text" id="nombre" name="nombre" placeholder="Juan Pérez" required autocomplete="name" />
+          </div>
+        </div>
+
+        <div class="field">
+          <label for="email">Correo electrónico *</label>
+          <div class="input-wrap">
+            <svg class="fi" viewBox="0 0 24 24"><path d="M20 4H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 4l-8 5-8-5V6l8 5 8-5v2z"/></svg>
+            <input type="email" id="email" name="email" placeholder="juan@empresa.cl" required autocomplete="email" />
+          </div>
+        </div>
+
+        <div class="field">
+          <label for="telefono">Teléfono</label>
+          <div class="input-wrap">
+            <svg class="fi" viewBox="0 0 24 24"><path d="M6.6 10.8c1.4 2.8 3.8 5.1 6.6 6.6l2.2-2.2c.27-.27.67-.36 1.02-.24 1.12.37 2.32.57 3.58.57.55 0 1 .45 1 1V20c0 .55-.45 1-1 1C10.29 21 3 13.71 3 5c0-.55.45-1 1-1h3.5c.55 0 1 .45 1 1 0 1.25.2 2.45.57 3.57.11.35.03.74-.24 1.01L6.6 10.8z"/></svg>
+            <input type="tel" id="telefono" name="telefono" placeholder="+56 9 1234 5678" autocomplete="tel" />
+          </div>
+        </div>
+
+        <div class="field">
+          <label for="empresa">Empresa</label>
+          <div class="input-wrap">
+            <svg class="fi" viewBox="0 0 24 24"><path d="M12 7V3H2v18h20V7H12zM6 19H4v-2h2v2zm0-4H4v-2h2v2zm0-4H4V9h2v2zm0-4H4V5h2v2zm4 12H8v-2h2v2zm0-4H8v-2h2v2zm0-4H8V9h2v2zm0-4H8V5h2v2zm10 12h-8v-2h2v-2h-2v-2h2v-2h-2V9h8v10zm-2-8h-2v2h2v-2zm0 4h-2v2h2v-2z"/></svg>
+            <input type="text" id="empresa" name="empresa" placeholder="Nombre de la empresa" autocomplete="organization" />
+          </div>
+        </div>
+
+        <button type="submit" class="btn-submit" id="submitBtn">Enviar mis datos</button>
+        <div class="feedback" id="feedback"></div>
+      </form>
+    </div>
+  </div>
+
+  <footer>© 2025 Market Share · Todos los derechos reservados</footer>
+
+  <script>
+    /* ── CONFIGURACIÓN ──────────────────────────────────
+       Cuando tengas la URL del Google Apps Script,
+       reemplaza el valor de SHEET_URL abajo.
+    ──────────────────────────────────────────────────── */
+    const SHEET_URL = 'TU_GOOGLE_APPS_SCRIPT_URL_AQUI';
+
+    /* ── vCard con los datos del contacto ──────────── */
+    const VCARD = [
+      'BEGIN:VCARD',
+      'VERSION:3.0',
+      'FN:Mauricio Meneses',
+      'N:Meneses;Mauricio;;;',
+      'TITLE:Jefe de Operaciones',
+      'ORG:Market Share',
+      'EMAIL;TYPE=WORK:mauricio.meneses@marketshare.cl',
+      'TEL;TYPE=CELL:+56926364872',
+      'ADR;TYPE=WORK:;;Av. Del Parque 5339 Of. 210;Huechuraba;;;CL',
+      'URL:https://www.marketshare.cl',
+      'END:VCARD'
+    ].join('\r\n');
+
+    /* ── Generar QR ─────────────────────────────────── */
+    new QRCode(document.getElementById('qr-code'), {
+      text:         VCARD,
+      width:        128,
+      height:       128,
+      colorDark:    '#2A5C2A',
+      colorLight:   '#ffffff',
+      correctLevel: QRCode.CorrectLevel.M
+    });
+
+    /* ── Descarga del .vcf ──────────────────────────── */
+    function downloadVCard() {
+      const blob = new Blob([VCARD], { type: 'text/vcard;charset=utf-8' });
+      const url  = URL.createObjectURL(blob);
+      const a    = Object.assign(document.createElement('a'), {
+        href: url, download: 'mauricio_meneses.vcf'
+      });
+      a.click();
+      URL.revokeObjectURL(url);
+    }
+
+    /* ── Envío del formulario → Google Sheets ───────── */
+    document.getElementById('contactForm').addEventListener('submit', async (e) => {
+      e.preventDefault();
+
+      const btn  = document.getElementById('submitBtn');
+      const fb   = document.getElementById('feedback');
+      fb.className = 'feedback';
+
+      const nombre   = document.getElementById('nombre').value.trim();
+      const email    = document.getElementById('email').value.trim();
+      const telefono = document.getElementById('telefono').value.trim();
+      const empresa  = document.getElementById('empresa').value.trim();
+
+      if (!nombre || !email) {
+        fb.textContent = 'Por favor completa nombre y correo electrónico.';
+        fb.className   = 'feedback err';
+        return;
+      }
+
+      if (SHEET_URL === 'TU_GOOGLE_APPS_SCRIPT_URL_AQUI') {
+        fb.textContent = 'Formulario pendiente de configuración con Google Sheets.';
+        fb.className   = 'feedback err';
+        return;
+      }
+
+      btn.disabled    = true;
+      btn.textContent = 'Enviando…';
+
+      try {
+        await fetch(SHEET_URL, {
+          method:  'POST',
+          mode:    'no-cors',
+          headers: { 'Content-Type': 'application/json' },
+          body:    JSON.stringify({
+            fecha:    new Date().toLocaleString('es-CL'),
+            nombre, email, telefono, empresa
+          })
+        });
+
+        fb.textContent = '¡Gracias! Tus datos fueron registrados correctamente.';
+        fb.className   = 'feedback ok';
+        e.target.reset();
+      } catch {
+        fb.textContent = 'Error al enviar. Por favor inténtalo nuevamente.';
+        fb.className   = 'feedback err';
+      } finally {
+        btn.disabled    = false;
+        btn.textContent = 'Enviar mis datos';
+      }
+    });
+  </script>
+</body>
+</html>
