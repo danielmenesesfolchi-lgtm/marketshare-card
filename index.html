@@ -69,14 +69,15 @@
 
     /* nombre y cargo */
     .card-identity {
-      padding: 22px 28px 0;
+      padding: 18px 28px 20px;
+      background: var(--green);
       border-top: 4px solid var(--orange);
     }
 
     .person-name {
       font-size: 1.6rem;
       font-weight: 800;
-      color: var(--green);
+      color: var(--white);
       letter-spacing: -.3px;
       line-height: 1.1;
     }
@@ -86,7 +87,7 @@
       margin-top: 6px;
       font-size: .85rem;
       font-weight: 700;
-      color: var(--orange);
+      color: rgba(255,255,255,.80);
       text-transform: uppercase;
       letter-spacing: 1px;
     }
@@ -268,7 +269,7 @@
       flex-shrink: 0;
     }
 
-    input {
+    input:not([type="radio"]) {
       width: 100%;
       padding: 11px 14px 11px 38px;
       border: 1.5px solid var(--border);
@@ -281,12 +282,38 @@
       color: var(--text);
     }
 
-    input::placeholder { color: #bbb; }
+    input:not([type="radio"])::placeholder { color: #bbb; }
 
-    input:focus {
+    input:not([type="radio"]):focus {
       border-color: var(--green);
       background: white;
       box-shadow: 0 0 0 3px rgba(42,92,42,.10);
+    }
+
+    .radio-group {
+      display: flex;
+      gap: 16px;
+      margin-top: 4px;
+    }
+
+    .radio-label {
+      display: flex;
+      align-items: center;
+      gap: 7px;
+      cursor: pointer;
+      font-size: .92rem;
+      color: var(--text);
+      font-weight: 600;
+      text-transform: none;
+      letter-spacing: 0;
+    }
+
+    .radio-label input[type="radio"] {
+      width: 17px;
+      height: 17px;
+      accent-color: var(--green);
+      cursor: pointer;
+      flex-shrink: 0;
     }
 
     .btn-submit {
@@ -445,6 +472,28 @@
           </div>
         </div>
 
+        <div class="field">
+          <label>¿Cuentas con reposición en supermercado?</label>
+          <div class="radio-group">
+            <label class="radio-label">
+              <input type="radio" name="reposicion" id="reposicion-si" value="Sí" />
+              Sí
+            </label>
+            <label class="radio-label">
+              <input type="radio" name="reposicion" id="reposicion-no" value="No" />
+              No
+            </label>
+          </div>
+        </div>
+
+        <div class="field" id="field-agencia" style="display:none">
+          <label for="agencia">Nombre de la agencia</label>
+          <div class="input-wrap">
+            <svg class="fi" viewBox="0 0 24 24"><path d="M20 6h-2.18c.07-.44.18-.88.18-1.34C18 2.54 15.96.5 13.5.5c-1.3 0-2.4.54-3.23 1.38L9 3.17 7.73 1.88C6.9.54 5.8 0 4.5 0 2.04 0 0 2.04 0 4.5c0 .46.08.9.18 1.34H0v2h20c1.1 0 2 .9 2 2v9c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V9.5H0V19c0 2.21 1.79 4 4 4h16c2.21 0 4-1.79 4-4V10c0-2.21-1.79-4-4-4z"/></svg>
+            <input type="text" id="agencia" name="agencia" placeholder="Nombre de la agencia de reposición" />
+          </div>
+        </div>
+
         <button type="submit" class="btn-submit" id="submitBtn">Enviar mis datos</button>
         <div class="feedback" id="feedback"></div>
       </form>
@@ -496,6 +545,17 @@
       URL.revokeObjectURL(url);
     }
 
+    /* ── Campo condicional de agencia ──────────────── */
+    document.querySelectorAll('input[name="reposicion"]').forEach(radio => {
+      radio.addEventListener('change', () => {
+        document.getElementById('field-agencia').style.display =
+          radio.value === 'Sí' ? 'block' : 'none';
+        if (radio.value !== 'Sí') {
+          document.getElementById('agencia').value = '';
+        }
+      });
+    });
+
     /* ── Envío del formulario → Google Sheets ───────── */
     document.getElementById('contactForm').addEventListener('submit', async (e) => {
       e.preventDefault();
@@ -504,10 +564,12 @@
       const fb   = document.getElementById('feedback');
       fb.className = 'feedback';
 
-      const nombre   = document.getElementById('nombre').value.trim();
-      const email    = document.getElementById('email').value.trim();
-      const telefono = document.getElementById('telefono').value.trim();
-      const empresa  = document.getElementById('empresa').value.trim();
+      const nombre     = document.getElementById('nombre').value.trim();
+      const email      = document.getElementById('email').value.trim();
+      const telefono   = document.getElementById('telefono').value.trim();
+      const empresa    = document.getElementById('empresa').value.trim();
+      const reposicion = document.querySelector('input[name="reposicion"]:checked')?.value || '';
+      const agencia    = document.getElementById('agencia').value.trim();
 
       if (!nombre || !email) {
         fb.textContent = 'Por favor completa nombre y correo electrónico.';
@@ -531,7 +593,7 @@
           headers: { 'Content-Type': 'application/json' },
           body:    JSON.stringify({
             fecha:    new Date().toLocaleString('es-CL'),
-            nombre, email, telefono, empresa
+            nombre, email, telefono, empresa, reposicion, agencia
           })
         });
 
